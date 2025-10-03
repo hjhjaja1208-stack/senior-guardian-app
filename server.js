@@ -20,7 +20,7 @@ const db = await mysql.createPool({
   user: "root",
   password: "LiSpdcnPQeHnJvNBpvgwcylNnKhraRNg",
   database: "railway",
-  port: 3306,
+  port: 23480,
 });
 
 const SMS = coolsms.default;
