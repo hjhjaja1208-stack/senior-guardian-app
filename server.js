@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 // ✅ MySQL 연결 풀 (Railway 값 직접 넣음)
 const db = await mysql.createPool({
-  host: "mysql.railway.internal",
+  host: "yamabiko.proxy.rlwy.net",
   user: "root",
   password: "LiSpdcnPQeHnJvNBpvgwcylNnKhraRNg",
   database: "railway",
