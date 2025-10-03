@@ -14,12 +14,13 @@ app.use(cors());
 app.use(bodyParser.json());
 
 
-// ✅ MySQL 연결 풀
+// ✅ MySQL 연결 풀 (Railway 값 직접 넣음)
 const db = await mysql.createPool({
-  host: "localhost",
-  user: "root", // 본인 MySQL 사용자명
-  password: "1208", // 본인 MySQL 비밀번호
-  database: "senior_guardian", // 본인 DB 이름
+  host: "mysql.railway.internal",
+  user: "root",
+  password: "LiSpdcnPQeHnJvNBpvgwcylNnKhraRNg",
+  database: "railway",
+  port: 3306,
 });
 
 const SMS = coolsms.default;
@@ -40,17 +41,19 @@ app.post("/api/check-message", async (req, res) => {
       risk = "위험";
     }
 
-    // 2️⃣ 전화번호 / URL 검사 (DB)
-    const [sources] = await db.query("SELECT value FROM scam_sources");
-
-    // 메시지를 정규화 (숫자+영문만)
-    const normalizedMessage = message.replace(/[^0-9a-zA-Z]/g, "");
-
-    if (sources.some(row =>
-      normalizedMessage.includes(row.value.replace(/[^0-9a-zA-Z]/g, ""))
-    )) {
+    
+    const [phones] = await db.query("SELECT value FROM scam_sources WHERE type='phone'");
+    const normalizedMessage = message.replace(/[^0-9]/g, ""); 
+    if (phones.some(row => normalizedMessage.includes(row.value.replace(/[^0-9]/g, "")))) {
       risk = "위험";
     }
+
+    const [accounts] = await db.query("SELECT value FROM scam_sources WHERE type='account'");
+    if (accounts.some(row => message.includes(row.value))) {
+      risk = "위험";
+    }
+
+
 
 // ✅ 위험이면 DB에 있는 모든 가족 번호로 문자 발송
     if (risk === "위험") {
